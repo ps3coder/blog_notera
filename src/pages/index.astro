@@ -1,0 +1,66 @@
+---
+/**
+ * Blog home — Same colors and typography as portfolio AboutMe.
+ * No SVG icons.
+ */
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<main class="blog-page" aria-label="Blog">
+		<section class="blog-intro">
+			<h1 class="blog-title">
+				Blog
+			</h1>
+			<p class="blog-paragraph">
+				Welcome. This is the blog — same look and feel as the portfolio: PP Neue Montreal, theme colors, and no SVG icons.
+			</p>
+			<p class="blog-paragraph">
+				You can add posts and move ahead from here.
+			</p>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	.blog-page {
+		max-width: 1270px;
+		margin: 0 auto;
+		padding: 2.78rem 2.78rem 4rem;
+		min-height: 100vh;
+		font-family: "PP Neue Montreal", "NeueMontreal-Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+	}
+
+	.blog-intro {
+		background: var(--color-bg);
+		color: var(--color-ink);
+	}
+
+	.blog-title {
+		margin: 0 0 1.67rem;
+		font-weight: 400;
+		font-size: 2.78rem;
+		line-height: 3.33rem;
+		letter-spacing: 0;
+		color: var(--color-ink);
+	}
+
+	.blog-paragraph {
+		margin: 0 0 1rem;
+		max-width: 65ch;
+		font-size: 1rem;
+		line-height: 1.67rem;
+		color: var(--color-ink);
+	}
+
+	@media screen and (max-width: 768px) {
+		.blog-page {
+			padding: 2rem 1.5rem 3rem;
+		}
+
+		.blog-title {
+			font-size: 2.22rem;
+			line-height: 2.78rem;
+		}
+	}
+</style>

@@ -1,0 +1,36 @@
+/**
+ * Theme — Central design tokens (same as portfolio).
+ * Use these variables in components instead of hardcoded colors.
+ */
+
+:root {
+	/* Light theme (default) */
+	--color-bg: #fbfbfb;
+	--color-ink: #0a0a0a;
+	--color-muted: rgba(0, 0, 0, 0.65);
+	--color-link: #0000ff;
+	--color-link-hover: #0000cc;
+	--color-paper: #ffffff;
+	--color-border: rgba(0, 0, 0, 0.2);
+	--color-line: rgba(0, 0, 0, 0.2);
+	--shadow-1: 0 18px 35px rgba(0, 0, 0, 0.18);
+	--shadow-2: 0 45px 90px rgba(0, 0, 0, 0.13);
+	--radius: 18px;
+	--radius-lg: 22px;
+}
+
+[data-theme="dark"],
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--color-bg: #0a0a0a;
+		--color-ink: #fbfbfb;
+		--color-muted: rgba(255, 255, 255, 0.65);
+		--color-link: #6b9fff;
+		--color-link-hover: #9bbfff;
+		--color-paper: #1a1a1a;
+		--color-border: rgba(255, 255, 255, 0.2);
+		--color-line: rgba(255, 255, 255, 0.2);
+		--shadow-1: 0 18px 35px rgba(0, 0, 0, 0.4);
+		--shadow-2: 0 45px 90px rgba(0, 0, 0, 0.35);
+	}
+}
