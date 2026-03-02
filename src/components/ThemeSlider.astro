@@ -1,0 +1,184 @@
+---
+/**
+ * Reusable theme slider — 40-segment bar (dark → light).
+ * variant "list" = blog index (grid/list toggle); "post" = single post (sunglasses icon).
+ */
+import '../styles/theme-slider.css';
+
+interface Props {
+	variant?: 'list' | 'post';
+}
+const { variant = 'list' } = Astro.props;
+---
+
+<div class="theme-control-wrap">
+	{variant === 'list' ? (
+		<button type="button" class="theme-slider-box theme-slider-box--list" id="theme-view-toggle" aria-label="Toggle grid or list view (list)" data-view="list">
+			<svg class="icon-view icon-grid" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path fill="none" d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zM4 15a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/>
+			</svg>
+			<svg class="icon-view icon-list" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path fill="none" d="M9 6h11M9 12h11M9 18h11M5 6v.01M5 12v.01M5 18v.01"/>
+			</svg>
+		</button>
+	) : (
+		<button type="button" class="theme-slider-box theme-slider-box--post" id="eye-comfort-toggle" aria-label="Toggle eye comfort (warm filter)" aria-pressed="false" data-eye-comfort="off">
+			<svg class="icon-view icon-sunglasses" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path fill="none" d="M8 4H6L3 14M16 4h2l3 10m-11 2h4m7 .5a3.5 3.5 0 0 1-7 0V14h7zm-11 0a3.5 3.5 0 0 1-7 0V14h7zM4 14l4.5 4.5M15 14l4.5 4.5"/>
+			</svg>
+		</button>
+	)}
+	<div class="theme-segment-wrap" role="group" aria-label="Theme">
+		<div class="theme-segment-bar" id="theme-segment-bar">
+		{Array.from({ length: 40 }, (_, i) => (
+			<button
+				type="button"
+				class="theme-segment-btn"
+				aria-label={`Theme segment ${i + 1}`}
+				aria-pressed={i === 0}
+				data-index={i}
+			/>
+		))}
+		<div class="theme-segment-indicator" id="theme-segment-indicator" aria-hidden="true"></div>
+		</div>
+	</div>
+</div>
+<script>
+	(function () {
+		var TOTAL = 40;
+		var themes = ['dark', 'dim', 'gray', 'soft', 'light'];
+		function indexToTheme(idx: number) { return themes[Math.min(4, Math.floor(idx / 8))]; }
+		var bar = document.getElementById('theme-segment-bar');
+		var indicator = document.getElementById('theme-segment-indicator');
+		if (!bar || !indicator) return;
+		var ind = indicator;
+		var buttons = bar.querySelectorAll('.theme-segment-btn');
+		var gap = 2;
+		var selectedIndex = 0;
+		var dragging = false;
+		var startX = 0;
+		var startIndex = 0;
+
+		function getSegmentWidth() {
+			if (!buttons.length) return 0;
+			return buttons[0].getBoundingClientRect().width;
+		}
+		function updateIndicator() {
+			var w = getSegmentWidth();
+			ind.style.width = w + 'px';
+			ind.style.left = (selectedIndex * (w + gap)) + 'px';
+		}
+		function setIndex(idx: number) {
+			selectedIndex = Math.max(0, Math.min(TOTAL - 1, idx));
+			buttons.forEach(function (b, i) {
+				b.setAttribute('aria-pressed', i === selectedIndex ? 'true' : 'false');
+			});
+			updateIndicator();
+			document.documentElement.setAttribute('data-theme', indexToTheme(selectedIndex));
+			document.documentElement.setAttribute('data-theme-level', String(selectedIndex));
+			localStorage.setItem('themeLevel', String(selectedIndex));
+		}
+
+		var level = document.documentElement.getAttribute('data-theme-level');
+		if (level !== null) {
+			var n = parseInt(level, 10);
+			if (!isNaN(n) && n >= 0 && n <= 39) selectedIndex = n;
+		}
+		setIndex(selectedIndex);
+
+		bar.addEventListener('mousedown', function (e) {
+			if (e.button !== 0) return;
+			e.preventDefault();
+			dragging = true;
+			startX = e.clientX;
+			startIndex = selectedIndex;
+		});
+		window.addEventListener('mousemove', function (e) {
+			if (!dragging) return;
+			if ((e.buttons & 1) !== 1) { dragging = false; return; }
+			var w = getSegmentWidth();
+			var step = w + gap;
+			var dx = e.clientX - startX;
+			var delta = Math.round(dx / step);
+			setIndex(startIndex + delta);
+		});
+		window.addEventListener('mouseup', function (e) {
+			if (e.button === 0) dragging = false;
+		});
+		document.addEventListener('mouseleave', function () { dragging = false; });
+		buttons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				setIndex(parseInt(btn.getAttribute('data-index') ?? '0', 10));
+			});
+		});
+		window.addEventListener('resize', updateIndicator);
+	})();
+
+	(function () {
+		var toggle = document.getElementById('theme-view-toggle');
+		if (!toggle) return;
+		var btn = toggle;
+		var KEY = 'blogViewMode';
+		function applyView(view: string) {
+			btn.setAttribute('data-view', view);
+			btn.setAttribute('aria-label', view === 'grid' ? 'Toggle grid or list view (grid)' : 'Toggle grid or list view (list)');
+			try { localStorage.setItem(KEY, view); } catch (e) {}
+			window.dispatchEvent(new CustomEvent('blog-view-change', { detail: { view: view } }));
+		}
+		try {
+			var saved = localStorage.getItem(KEY);
+			if (saved === 'grid' || saved === 'list') {
+				applyView(saved);
+			} else {
+				btn.setAttribute('data-view', 'list');
+				btn.setAttribute('aria-label', 'Toggle grid or list view (list)');
+			}
+		} catch (e) {
+			btn.setAttribute('data-view', 'list');
+			btn.setAttribute('aria-label', 'Toggle grid or list view (list)');
+		}
+		btn.addEventListener('click', function () {
+			var view = btn.getAttribute('data-view') ?? 'list';
+			var next = view === 'grid' ? 'list' : 'grid';
+			applyView(next);
+		});
+	})();
+
+	(function () {
+		var KEY = 'eyeComfort';
+		var btn = document.getElementById('eye-comfort-toggle');
+		console.log('[Eye comfort] Button found:', !!btn, btn ? btn.id : 'n/a');
+		if (!btn) return;
+		var el = btn;
+		function setComfort(on: boolean) {
+			console.log('[Eye comfort] setComfort(', on, ')');
+			if (on) {
+				document.documentElement.setAttribute('data-eye-comfort', 'on');
+				el.setAttribute('aria-pressed', 'true');
+				el.setAttribute('data-eye-comfort', 'on');
+				el.setAttribute('aria-label', 'Turn off eye comfort (warm filter)');
+			} else {
+				document.documentElement.removeAttribute('data-eye-comfort');
+				el.setAttribute('aria-pressed', 'false');
+				el.setAttribute('data-eye-comfort', 'off');
+				el.setAttribute('aria-label', 'Toggle eye comfort (warm filter)');
+			}
+			try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) {}
+			var overlay = document.querySelector('.eye-comfort-overlay');
+			console.log('[Eye comfort] html[data-eye-comfort]:', document.documentElement.getAttribute('data-eye-comfort'), '| overlay:', !!overlay, overlay ? 'opacity ' + getComputedStyle(overlay).opacity : '');
+		}
+		try {
+			var saved = localStorage.getItem(KEY);
+			console.log('[Eye comfort] init from localStorage:', saved);
+			setComfort(saved === 'on');
+		} catch (e) {
+			console.log('[Eye comfort] init error:', e);
+			setComfort(false);
+		}
+		el.addEventListener('click', function () {
+			var on = el.getAttribute('data-eye-comfort') === 'on';
+			console.log('[Eye comfort] click, current on:', on, '-> toggling to', !on);
+			setComfort(!on);
+		});
+	})();
+</script>

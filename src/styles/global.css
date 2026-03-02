@@ -12,6 +12,7 @@ html {
 	min-height: 100%;
 	box-sizing: border-box;
 	scroll-behavior: smooth;
+	overflow-x: hidden;
 }
 
 *,
@@ -28,4 +29,21 @@ body {
 	background: var(--color-bg);
 	color: var(--color-ink);
 	font-family: "PP Neue Montreal", "NeueMontreal-Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Theme slider styles live in theme-slider.css; use ThemeSlider component or @import '../styles/theme-slider.css' in other UI */
+
+/* Eye comfort overlay — subtle warm tint when sunglasses toggle is on */
+.eye-comfort-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	pointer-events: none;
+	opacity: 0;
+	background: rgba(255, 245, 200, 0.22);
+	transition: opacity 0.35s ease;
+}
+
+html[data-eye-comfort="on"] .eye-comfort-overlay {
+	opacity: 1;
 }

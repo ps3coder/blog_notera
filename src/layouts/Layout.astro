@@ -1,9 +1,15 @@
 ---
 /**
  * Root layout — Same colors and fonts as portfolio (AboutMe).
- * No SVG icons; favicon.ico only.
+ * themeControlVariant: "list" = index (grid/list), "post" = single post (sunglasses).
  */
 import '../styles/global.css';
+import ThemeSlider from '../components/ThemeSlider.astro';
+
+interface Props {
+	themeControlVariant?: 'list' | 'post';
+}
+const { themeControlVariant = 'list' } = Astro.props;
 ---
 
 <!doctype html>
@@ -15,8 +21,28 @@ import '../styles/global.css';
 		<meta name="generator" content={Astro.generator} />
 		<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/pp-neue-montreal" />
 		<title>Blog</title>
+		<script is:inline>
+			(function () {
+				var raw = localStorage.getItem('themeLevel');
+				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				var level = raw !== null ? parseInt(raw, 10) : (prefersDark ? 0 : 39);
+				if (isNaN(level) || level < 0) level = 0;
+				if (level > 39) level = 39;
+				var themes = ['dark', 'dim', 'gray', 'soft', 'light'];
+				var themeIdx = Math.min(4, Math.floor(level / 8));
+				document.documentElement.setAttribute('data-theme', themes[themeIdx]);
+				document.documentElement.setAttribute('data-theme-level', String(level));
+				try {
+					if (localStorage.getItem('eyeComfort') === 'on') {
+						document.documentElement.setAttribute('data-eye-comfort', 'on');
+					}
+				} catch (e) {}
+			})();
+		</script>
 	</head>
 	<body>
+		<div class="eye-comfort-overlay" aria-hidden="true"></div>
+		<ThemeSlider variant={themeControlVariant} />
 		<slot />
 	</body>
 </html>

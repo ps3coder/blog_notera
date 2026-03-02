@@ -1,0 +1,82 @@
+/**
+ * Common Debug page — /common_debug
+ * Separate CSS; no blue outline, no borders, no border-radius.
+ */
+
+.common-debug .blog-page {
+	max-width: 1270px;
+	margin: 0 auto;
+	padding: 2.78rem 2.78rem 4rem;
+	min-height: 100vh;
+	font-family: "PP Neue Montreal", "NeueMontreal-Regular", -apple-system,
+		BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.common-debug .blog-intro {
+	background: var(--color-bg);
+	color: var(--color-ink);
+}
+
+.common-debug .blog-title {
+	margin: 0 0 1.67rem;
+	font-weight: 400;
+	font-size: 2.78rem;
+	line-height: 3.33rem;
+	letter-spacing: 0;
+	color: var(--color-ink);
+}
+
+.common-debug .blog-paragraph {
+	margin: 0 0 1rem;
+	max-width: 65ch;
+	font-size: 1rem;
+	line-height: 1.67rem;
+	color: var(--color-ink);
+}
+
+/* 40 segment buttons — no outline, no borders, no border-radius */
+.common-debug .segment-bar-wrap {
+	margin-top: 1.5rem;
+	margin-left: 1rem;
+	margin-right: auto;
+	max-width: 220px;
+}
+
+.common-debug .segment-bar {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+	gap: 2px;
+	width: 100%;
+	height: 24px;
+	padding: 0;
+	background: var(--color-border);
+	overflow: hidden;
+}
+
+.common-debug .segment-indicator {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	pointer-events: none;
+	background: #e8a0a0;
+	transition: left 0.2s ease;
+}
+
+.common-debug .segment-btn {
+	flex: 1;
+	min-width: 0;
+	padding: 0;
+	border: none;
+	cursor: pointer;
+	background: var(--color-bg);
+	transition: background 0.15s ease;
+}
+
+.common-debug .segment-btn:hover {
+	opacity: 0.9;
+}
+
+.common-debug .segment-btn:focus {
+	outline: none;
+}

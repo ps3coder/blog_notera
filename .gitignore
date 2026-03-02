@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# dev cache for GitHub post fetches
+.blog-cache/
+
 # dependencies
 node_modules/
 

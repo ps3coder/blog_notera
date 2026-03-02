@@ -2,7 +2,7 @@
 title: "Engineering Clarity in Modern Distributed Systems"
 description: "A deep dive into designing scalable, observable, and maintainable distributed architectures with practical examples."
 pubDate: 2026-03-02
-tags: ["architecture", "distributed-systems", "backend", "scalability"]
+tags: ["architecture", "distributed-systems", "backend", "scalab![1772446583646](image/engineering-clarity-in-modern-systems/1772446583646.png)ility"]
 draft: false
 ---
 

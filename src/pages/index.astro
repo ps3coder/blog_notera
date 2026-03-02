@@ -1,34 +1,119 @@
 ---
 /**
- * Blog home — Same colors and typography as portfolio AboutMe.
- * No SVG icons.
+ * Blog home — Lists posts from GitHub (config in src/data/github-posts.ts).
+ * Fetched at build time; no database.
  */
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import { GITHUB_POSTS } from "../data/github-posts";
+import { fetchAndParsePost } from "../lib/parse-github-post";
+
+const posts = await Promise.all(
+	GITHUB_POSTS.map(async ({ slug, rawUrl }) => {
+		const parsed = await fetchAndParsePost(rawUrl);
+		return { slug, ...parsed };
+	})
+);
+
+const list = posts
+	.filter((p) => !p.draft)
+	.sort((a, b) => {
+		const da = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+		const db = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+		return db - da;
+	});
 ---
 
 <Layout>
+	<script is:inline>
+		(function(){ try { var v = localStorage.getItem('blogViewMode'); document.body.dataset.blogViewMode = (v === 'grid' || v === 'list') ? v : 'list'; } catch(e) { document.body.dataset.blogViewMode = 'list'; } })();
+	</script>
 	<main class="blog-page" aria-label="Blog">
 		<section class="blog-intro">
-			<h1 class="blog-title">
-				Blog
-			</h1>
+			<h1 class="blog-title">Blog</h1>
 			<p class="blog-paragraph">
-				Welcome. This is the blog — same look and feel as the portfolio: PP Neue Montreal, theme colors, and no SVG icons.
-			</p>
-			<p class="blog-paragraph">
-				You can add posts and move ahead from here.
+				Posts are written and stored on GitHub; this site fetches them at build time. No database — low cost, fast.
 			</p>
 		</section>
+
+		<section class="blog-list blog-list-list" aria-label="Posts (list)">
+			<ul class="post-list">
+				{list.map((post) => (
+					<li class="post-item">
+						<a class="post-link" href={`/blog/${post.slug}`}>
+							<span class="post-title">{post.title}</span>
+							{post.pubDate && (
+								<time class="post-date" datetime={post.pubDate}>
+									{new Date(post.pubDate).toLocaleDateString("en-US", {
+										year: "numeric",
+										month: "short",
+										day: "numeric",
+									})}
+								</time>
+							)}
+						</a>
+						{post.description && (
+							<p class="post-description">{post.description}</p>
+						)}
+					</li>
+				))}
+			</ul>
+			{list.length === 0 && (
+				<p class="blog-paragraph">No posts yet. Add entries in <code>src/data/github-posts.ts</code> pointing to your GitHub raw URLs.</p>
+			)}
+		</section>
+
+		<section class="blog-list blog-list-grid" aria-label="Posts (grid)">
+			{list.length === 0 ? (
+				<p class="blog-paragraph">No posts yet. Add entries in <code>src/data/github-posts.ts</code> pointing to your GitHub raw URLs.</p>
+			) : (
+				<div class="post-grid">
+					{list.map((post) => (
+						<a class="post-card" href={`/blog/${post.slug}`}>
+							<h2 class="post-card-title">{post.title}</h2>
+							{post.pubDate && (
+								<time class="post-card-date" datetime={post.pubDate}>
+									{new Date(post.pubDate).toLocaleDateString("en-US", {
+										year: "numeric",
+										month: "short",
+										day: "numeric",
+									})}
+								</time>
+							)}
+							{post.description && (
+								<p class="post-card-description">{post.description}</p>
+							)}
+						</a>
+					))}
+				</div>
+			)}
+		</section>
 	</main>
+	<script>
+		(function () {
+			function setViewMode(mode: string) {
+				document.body.dataset.blogViewMode = mode;
+			}
+			try {
+				var saved = localStorage.getItem('blogViewMode');
+				if (saved === 'grid' || saved === 'list') setViewMode(saved);
+			} catch (e) {}
+			window.addEventListener('blog-view-change', function (e: Event) {
+				var ev = e as CustomEvent<{ view: string }>;
+				if (ev.detail && (ev.detail.view === 'grid' || ev.detail.view === 'list')) setViewMode(ev.detail.view);
+			});
+		})();
+	</script>
 </Layout>
 
 <style>
 	.blog-page {
-		max-width: 1270px;
+		max-width: min(1270px, 100%);
 		margin: 0 auto;
-		padding: 2.78rem 2.78rem 4rem;
+		padding: 2.78rem clamp(1.25rem, 6vw, 2.78rem) 4rem;
 		min-height: 100vh;
-		font-family: "PP Neue Montreal", "NeueMontreal-Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+		font-family: "PP Neue Montreal", "NeueMontreal-Regular", -apple-system,
+			BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+		box-sizing: border-box;
 	}
 
 	.blog-intro {
@@ -53,9 +138,139 @@ import Layout from '../layouts/Layout.astro';
 		color: var(--color-ink);
 	}
 
+	.blog-list {
+		margin-top: 2.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	@keyframes blog-view-in {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.blog-list-grid {
+		display: none;
+	}
+
+	body[data-blog-view-mode="grid"] .blog-list-list {
+		display: none;
+	}
+
+	body[data-blog-view-mode="grid"] .blog-list-grid {
+		display: block;
+		animation: blog-view-in 0.28s ease-out;
+	}
+
+	body[data-blog-view-mode="list"] .blog-list-list {
+		animation: blog-view-in 0.28s ease-out;
+	}
+
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1.5rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.post-card {
+		display: block;
+		padding: 0;
+		background: none;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.post-card-title {
+		margin: 0 0 0.5rem;
+		font-size: 1.22rem;
+		line-height: 1.4;
+		font-weight: 400;
+		color: var(--color-link);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.post-card:hover .post-card-title,
+	.post-card:focus-visible .post-card-title {
+		color: var(--color-link-hover);
+	}
+
+	.post-card-date {
+		display: block;
+		font-size: 0.9rem;
+		color: var(--color-muted);
+		margin-bottom: 0.35rem;
+	}
+
+	.post-card-description {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.post-item {
+		margin-bottom: 1.5rem;
+	}
+
+	.post-link {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.75rem;
+		text-decoration: none;
+		color: var(--color-link);
+	}
+
+	.post-link:hover,
+	.post-link:focus-visible {
+		color: var(--color-link-hover);
+	}
+
+	.post-title {
+		font-size: 1.22rem;
+		line-height: 1.4;
+		font-weight: 400;
+	}
+
+	.post-date {
+		font-size: 0.9rem;
+		color: var(--color-muted);
+	}
+
+	.post-description {
+		margin: 0.35rem 0 0;
+		max-width: 65ch;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+
+	code {
+		font-size: 0.9em;
+		padding: 0.15em 0.4em;
+		background: var(--color-border);
+		border-radius: 4px;
+	}
+
 	@media screen and (max-width: 768px) {
 		.blog-page {
-			padding: 2rem 1.5rem 3rem;
+			padding: 2rem clamp(1rem, 4vw, 1.5rem) 3rem;
 		}
 
 		.blog-title {
