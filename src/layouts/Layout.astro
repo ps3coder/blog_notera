@@ -41,7 +41,9 @@ const { themeControlVariant = 'list' } = Astro.props;
 		</script>
 	</head>
 	<body>
-		<div class="eye-comfort-overlay" aria-hidden="true"></div>
+		{themeControlVariant === 'post' && (
+			<div class="eye-comfort-overlay" aria-hidden="true"></div>
+		)}
 		<ThemeSlider variant={themeControlVariant} />
 		<slot />
 	</body>

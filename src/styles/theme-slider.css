@@ -143,3 +143,30 @@
 	background: #e8a0a0;
 	transition: left 0.2s ease;
 }
+
+@media screen and (max-width: 768px) {
+	.theme-control-wrap {
+		top: 1.25rem;
+		right: 5.3rem;
+		gap: 8px;
+	}
+
+	.back-to-blog-wrap {
+		top: 1.25rem;
+		left: 1.25rem;
+	}
+
+	.theme-slider-box {
+		width: 32px;
+		height: 32px;
+		border-radius: 6px;
+	}
+
+	.theme-segment-wrap {
+		max-width: min(280px, 80vw);
+	}
+
+	.theme-segment-bar {
+		height: 28px;
+	}
+}
