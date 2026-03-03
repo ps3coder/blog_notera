@@ -106,6 +106,34 @@ const { variant = 'list' } = Astro.props;
 			if (e.button === 0) dragging = false;
 		});
 		document.addEventListener('mouseleave', function () { dragging = false; });
+
+		// Touch support for mobile drag/slide
+		bar.addEventListener('touchstart', function (e) {
+			if (!e.touches || e.touches.length === 0) return;
+			var touch = e.touches[0];
+			dragging = true;
+			startX = touch.clientX;
+			startIndex = selectedIndex;
+			e.preventDefault();
+		}, { passive: false });
+		window.addEventListener('touchmove', function (e) {
+			if (!dragging) return;
+			if (!e.touches || e.touches.length === 0) return;
+			var touch = e.touches[0];
+			var w = getSegmentWidth();
+			var step = w + gap;
+			var dx = touch.clientX - startX;
+			var delta = Math.round(dx / step);
+			setIndex(startIndex + delta);
+			e.preventDefault();
+		}, { passive: false });
+		window.addEventListener('touchend', function () {
+			dragging = false;
+		});
+		window.addEventListener('touchcancel', function () {
+			dragging = false;
+		});
+
 		buttons.forEach(function (btn) {
 			btn.addEventListener('click', function () {
 				setIndex(parseInt(btn.getAttribute('data-index') ?? '0', 10));
