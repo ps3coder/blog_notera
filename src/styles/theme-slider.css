@@ -15,6 +15,106 @@
 	min-height: 24px;
 }
 
+.theme-control-rect {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	width: 178px;
+	height: 24px;
+	border: 1px solid var(--color-border);
+	background: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: auto;
+	overflow: hidden;
+}
+
+.theme-control-rect-input {
+	width: 100%;
+	height: 100%;
+	padding: 0 8px;
+	border: none;
+	outline: none;
+	background: transparent;
+	color: var(--color-ink);
+	font-family: inherit;
+	font-size: 0.78rem;
+}
+
+.theme-control-rect-input::placeholder {
+	color: var(--color-muted);
+}
+
+.theme-control-rect-buttons {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	height: 100%;
+	padding: 0 4px;
+}
+
+.theme-control-rect-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 100%;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: var(--color-ink);
+}
+
+.theme-control-rect-btn svg {
+	width: 16px;
+	height: 16px;
+	stroke: currentColor;
+}
+
+.theme-control-rect-btn--download:hover,
+.theme-control-rect-btn--share:hover {
+	opacity: 0.6;
+}
+
+.theme-control-rect-btn--favorite {
+	position: relative;
+}
+
+.theme-control-rect-btn--favorite .icon-heart-outline,
+.theme-control-rect-btn--favorite .icon-heart-filled {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.theme-control-rect-btn--favorite .icon-heart-filled {
+	opacity: 0;
+	transform: scale(1);
+}
+
+.theme-control-rect-btn--favorite[data-favorited="false"]:hover .icon-heart-outline {
+	opacity: 0;
+}
+
+.theme-control-rect-btn--favorite[data-favorited="false"]:hover .icon-heart-filled {
+	opacity: 0.3;
+	transform: scale(1.05);
+}
+
+.theme-control-rect-btn--favorite[data-favorited="true"] .icon-heart-outline {
+	opacity: 0;
+}
+
+.theme-control-rect-btn--favorite[data-favorited="true"] .icon-heart-filled {
+	opacity: 1;
+	transform: scale(1);
+}
+
 .back-to-blog-wrap {
 	position: fixed;
 	top: clamp(0.75rem, 2vw, 1.25rem);
@@ -168,5 +268,12 @@
 
 	.theme-segment-bar {
 		height: 28px;
+	}
+
+	.theme-control-rect {
+		width: 188px;
+		left: 0;
+		right: 0;
+		height: 32px;
 	}
 }
