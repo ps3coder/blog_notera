@@ -36,9 +36,17 @@ export async function getStaticPaths() {
 
 const { frontmatter, Content } = Astro.props;
 const { title, description, pubDate } = frontmatter as Frontmatter;
+const tags = Array.isArray((frontmatter as any)?.tags) ? ((frontmatter as any).tags as string[]) : undefined;
 ---
 
-<Layout themeControlVariant="post">
+<Layout
+	themeControlVariant="post"
+	title={title ?? "Notera Blog"}
+	description={description}
+	type="article"
+	publishedTime={pubDate}
+	tags={tags}
+>
 	<div class="back-to-blog-wrap">
 		<a href="/" class="theme-slider-box back-to-blog-btn" aria-label="Back to blog">
 			<svg class="icon-view icon-back-up" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

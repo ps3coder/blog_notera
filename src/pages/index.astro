@@ -35,7 +35,11 @@ const list = posts
 	});
 ---
 
-<Layout>
+<Layout
+	title="Notera Blog"
+	description="Engineering notes, systems, and practical writing."
+	type="website"
+>
 	<script is:inline>
 		(function(){ try { var v = localStorage.getItem('blogViewMode'); document.body.dataset.blogViewMode = (v === 'grid' || v === 'list') ? v : 'list'; } catch(e) { document.body.dataset.blogViewMode = 'list'; } })();
 	</script>
