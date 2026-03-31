@@ -180,7 +180,7 @@ Scores:
 east → 8.5
 west → 2.1
 sky → 1.3
-```
+``` 
 
 These scores are not yet probabilities. They must be transformed.
 
