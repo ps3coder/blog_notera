@@ -1,25 +1,41 @@
 ---
 /**
- * Single post — Content fetched from GitHub raw URL at build time.
- * No database; see src/data/github-posts.ts.
+ * Single post — Content rendered from local markdown in src/content/blog/*.md.
+ * Auto-generated routes at build time (no registry, no DB).
  */
 import Layout from "../../layouts/Layout.astro";
-import { GITHUB_POSTS } from "../../data/github-posts";
-import { fetchAndParsePost } from "../../lib/parse-github-post";
+
+type Frontmatter = {
+	title?: string;
+	description?: string;
+	pubDate?: string;
+	draft?: boolean;
+};
 
 export async function getStaticPaths() {
-	const paths = await Promise.all(
-		GITHUB_POSTS.map(async ({ slug, rawUrl }) => {
-			const parsed = await fetchAndParsePost(rawUrl);
-			if (parsed.draft) return null;
-			return { params: { slug }, props: { slug, ...parsed } };
-		})
-	);
-	return paths.filter(Boolean);
+	const modules = (await Astro.glob("../../content/blog/*.md")) as Array<{
+		frontmatter: Frontmatter;
+		file: string;
+		Content: any;
+	}>;
+
+	return modules
+		.filter((m) => !m.frontmatter?.draft)
+		.map((m) => {
+			const slug = m.file.split(/[/\\]/).pop()?.replace(/\.md$/i, "") ?? m.file;
+			return {
+				params: { slug },
+			props: {
+				slug,
+				frontmatter: m.frontmatter,
+				Content: m.Content,
+			},
+			};
+		});
 }
 
-const { title, description, pubDate, contentHtml } = Astro.props;
-const slug = Astro.params.slug;
+const { frontmatter, Content } = Astro.props;
+const { title, description, pubDate } = frontmatter as Frontmatter;
 ---
 
 <Layout themeControlVariant="post">
@@ -48,7 +64,9 @@ const slug = Astro.params.slug;
 					<p class="post-description">{description}</p>
 				)}
 			</header>
-			<div class="post-content set-prose" set:html={contentHtml} />
+			<div class="post-content set-prose">
+				<Content />
+			</div>
 		</article>
 	</main>
 </Layout>

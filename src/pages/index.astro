@@ -1,18 +1,30 @@
 ---
 /**
- * Blog home — Lists posts from GitHub (config in src/data/github-posts.ts).
- * Fetched at build time; no database.
+ * Blog home — Lists posts from local markdown in src/content/blog/*.md.
+ * Auto-detected at build time (no manual registry, no DB).
  */
 import Layout from "../layouts/Layout.astro";
-import { GITHUB_POSTS } from "../data/github-posts";
-import { fetchAndParsePost } from "../lib/parse-github-post";
 
-const posts = await Promise.all(
-	GITHUB_POSTS.map(async ({ slug, rawUrl }) => {
-		const parsed = await fetchAndParsePost(rawUrl);
-		return { slug, ...parsed };
-	})
-);
+type Frontmatter = {
+	title?: string;
+	description?: string;
+	pubDate?: string;
+	draft?: boolean;
+};
+
+const modules = await Astro.glob<{
+	frontmatter: Frontmatter;
+	file: string;
+}>("../content/blog/*.md");
+
+function slugFromFile(file: string): string {
+	return file.split(/[/\\]/).pop()?.replace(/\.md$/i, "") ?? file;
+}
+
+const posts: Array<{ slug: string } & Frontmatter> = modules.map((m) => ({
+	slug: slugFromFile(m.file),
+	...(m.frontmatter ?? {}),
+}));
 
 const list = posts
 	.filter((p) => !p.draft)
@@ -31,7 +43,7 @@ const list = posts
 		<section class="blog-intro">
 			<h1 class="blog-title">Blog</h1>
 			<p class="blog-paragraph">
-				Posts are written and stored on GitHub; this site fetches them at build time. No database — low cost, fast.
+				Posts are stored as local markdown in <code>src/content/blog</code> and rendered at build time. No database — low cost, fast.
 			</p>
 		</section>
 
@@ -58,13 +70,13 @@ const list = posts
 				))}
 			</ul>
 			{list.length === 0 && (
-				<p class="blog-paragraph">No posts yet. Add entries in <code>src/data/github-posts.ts</code> pointing to your GitHub raw URLs.</p>
+				<p class="blog-paragraph">No posts yet. Add markdown files under <code>src/content/blog</code>.</p>
 			)}
 		</section>
 
 		<section class="blog-list blog-list-grid" aria-label="Posts (grid)">
 			{list.length === 0 ? (
-				<p class="blog-paragraph">No posts yet. Add entries in <code>src/data/github-posts.ts</code> pointing to your GitHub raw URLs.</p>
+				<p class="blog-paragraph">No posts yet. Add markdown files under <code>src/content/blog</code>.</p>
 			) : (
 				<div class="post-grid">
 					{list.map((post) => (
