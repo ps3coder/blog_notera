@@ -39,6 +39,10 @@ const list = posts
 	<script is:inline>
 		(function(){ try { var v = localStorage.getItem('blogViewMode'); document.body.dataset.blogViewMode = (v === 'grid' || v === 'list') ? v : 'list'; } catch(e) { document.body.dataset.blogViewMode = 'list'; } })();
 	</script>
+	<script
+		type="module"
+		src={new URL("../scripts/pretext-balance.ts", import.meta.url).toString()}
+	></script>
 	<main class="blog-page" aria-label="Blog">
 		<section class="blog-intro">
 			<h1 class="blog-title">Blog</h1>
