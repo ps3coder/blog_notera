@@ -103,6 +103,19 @@ Your database should be treated like a critical dependency — not an infinite r
 
 One of the most common backend mistakes is chaining too many synchronous service calls.
 
+
+
+------------
+
+test 
+
+# Why Most Backend Systems Fail at Scale — And How to Prevent It
+
+![Backend Architecture](https://i.pinimg.com/736x/61/68/84/6168845b18ba420fda720cf0f02db2f2.jpg)
+
+> Systems rarely fail because of one big mistake.  
+> They fail because small design flaws compound under pressure.
+
 Example:
 
 ```ts
